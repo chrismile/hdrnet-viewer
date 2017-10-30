@@ -1,0 +1,1 @@
+The unoptimized pretrained models are approximately 1GB of size. Please get them from https://github.com/mgharbi/hdrnet and put them into the folder "Data/pretrained_models".
