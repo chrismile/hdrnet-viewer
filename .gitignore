@@ -57,3 +57,5 @@ docs/latex/*
 
 # Misc
 Data/pretrained_models/*
+
+build/*
