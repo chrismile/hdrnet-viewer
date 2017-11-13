@@ -12,6 +12,9 @@ Prerequisites (build currently only supported on Linux):
 
   The standard Python package of Tensorflow is not sufficient to build the application!
   You can read more about compiling the Tensorflow C++ API here: https://github.com/FloopCZ/tensorflow_cc
+  
+  Please note that the _shared_ build of TensorflowCC is required, as the application uses broad parts of the TensorFlow C++ API.
+  
 - sgl: https://github.com/chrismile/sgl
 
 Please note that pre-learned image filters are not included in this repository. The original implementation contains multiple pre-learned models. Please get them from https://github.com/mgharbi/hdrnet and put them into the folder "Data/pretrained_models".
