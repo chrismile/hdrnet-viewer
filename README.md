@@ -9,4 +9,7 @@ This application is a webcam viewer application using OpenGL and the TensorFlow 
 Prerequisites (build currently only supported on Linux):
 - OpenCV 2
 - Tensorflow 1.1 C++ API headers & library, expected to be in installed in the directory /usr/local
+
+  The standard Python package of Tensorflow is not sufficient to build the application!
+  You can read more about compiling the Tensorflow C++ API here: https://github.com/FloopCZ/tensorflow_cc
 - sgl: https://github.com/chrismile/sgl
