@@ -15,6 +15,6 @@ Prerequisites (build currently only supported on Linux):
   
   Please note that the _shared_ build of TensorflowCC is required, as the application uses broad parts of the TensorFlow C++ API.
   
-- sgl: https://github.com/chrismile/sgl
+- sgl: https://github.com/chrismile/sgl (use sudo make install to install this library on your system)
 
 Please note that pre-learned image filters are not included in this repository. The original implementation contains multiple pre-learned models. Please get them from https://github.com/mgharbi/hdrnet and put them into the folder "Data/pretrained_models".
