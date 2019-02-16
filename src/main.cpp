@@ -15,21 +15,21 @@ using namespace std;
 using namespace sgl;
 
 int main(int argc, char *argv[]) {
-	FileUtils::get()->initialize("hdrnet-viewer", argc, argv);
+    FileUtils::get()->initialize("hdrnet-viewer", argc, argv);
 
-	// Load the file containing the app settings
-	string settingsFile = FileUtils::get()->getConfigDirectory() + "settings.txt";
-	AppSettings::get()->loadSettings(settingsFile.c_str());
+    // Load the file containing the app settings
+    string settingsFile = FileUtils::get()->getConfigDirectory() + "settings.txt";
+    AppSettings::get()->loadSettings(settingsFile.c_str());
 
-	Window *window = AppSettings::get()->createWindow();
-	AppSettings::get()->initializeSubsystems();
+    Window *window = AppSettings::get()->createWindow();
+    AppSettings::get()->initializeSubsystems();
 
-	AppLogic *app = new VolumeLightApp();
-	app->run();
+    AppLogic *app = new VolumeLightApp();
+    app->run();
 
-	delete app;
-	AppSettings::get()->release();
-	delete window;
+    delete app;
+    AppSettings::get()->release();
+    delete window;
 
-	return 0;
+    return 0;
 }

@@ -23,25 +23,25 @@ using namespace sgl;
 class VolumeLightApp : public AppLogic
 {
 public:
-	VolumeLightApp();
-	~VolumeLightApp();
-	void render();
-	void update(float dt);
-	void resolutionChanged(EventPtr event);
+    VolumeLightApp();
+    ~VolumeLightApp();
+    void render();
+    void update(float dt);
+    void resolutionChanged(EventPtr event);
 
 private:
-	Webcam webcam;
-	FrameDataPtr frameImage;
-	FrameDataPtr downscaledImage;
-	TexturePtr frameTexture;
-	TexturePtr downscaledTexture;
+    Webcam webcam;
+    FrameDataPtr frameImage;
+    FrameDataPtr downscaledImage;
+    TexturePtr frameTexture;
+    TexturePtr downscaledTexture;
 
-	// Lighting & rendering
-	GridRenderer gridRenderer;
+    // Lighting & rendering
+    GridRenderer gridRenderer;
 
-	// User interaction
-	std::vector<std::string> filters;
-	int filterIndex;
+    // User interaction
+    std::vector<std::string> filters;
+    int filterIndex;
 };
 
 #endif /* LOGIC_VolumeLightApp_HPP_ */

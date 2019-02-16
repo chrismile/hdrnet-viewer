@@ -13,10 +13,10 @@
 
 struct FrameData {
 public:
-	FrameData();
-	~FrameData();
-	uint8_t *pixels;
-	int w, h;
+    FrameData();
+    ~FrameData();
+    uint8_t *pixels;
+    int w, h;
 };
 
 typedef boost::shared_ptr<FrameData> FrameDataPtr;

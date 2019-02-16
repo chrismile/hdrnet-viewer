@@ -21,23 +21,23 @@
 class GridRenderer
 {
 public:
-	GridRenderer();
-	//! \param path: Path to folder containing effect data
-	void initialize(const char *path);
-	//! Renders imageTexture with filter applied. Transform coefficients are predicted using lowresImage.
-	void renderTransformedImage(sgl::TexturePtr &imageTexture, FrameDataPtr &lowresImage);
-	//! Renders imageTexture normally (no filter applied).
-	void renderNormalImage(sgl::TexturePtr &imageTexture, FrameDataPtr &lowresImage);
+    GridRenderer();
+    //! \param path: Path to folder containing effect data
+    void initialize(const char *path);
+    //! Renders imageTexture with filter applied. Transform coefficients are predicted using lowresImage.
+    void renderTransformedImage(sgl::TexturePtr &imageTexture, FrameDataPtr &lowresImage);
+    //! Renders imageTexture normally (no filter applied).
+    void renderNormalImage(sgl::TexturePtr &imageTexture, FrameDataPtr &lowresImage);
 
 private:
-	void loadGuideParameters(const char *path);
-	std::vector<sgl::VertexTextured> createTexturedQuad(const sgl::AABB2 &renderRect);
+    void loadGuideParameters(const char *path);
+    std::vector<sgl::VertexTextured> createTexturedQuad(const sgl::AABB2 &renderRect);
 
-	GridPredictor gridPredictor;
-	std::vector<sgl::TexturePtr> gridTextures;
+    GridPredictor gridPredictor;
+    std::vector<sgl::TexturePtr> gridTextures;
 
-	sgl::ShaderProgramPtr gridRenderShader;
-	sgl::ShaderProgramPtr blitShader;
+    sgl::ShaderProgramPtr gridRenderShader;
+    sgl::ShaderProgramPtr blitShader;
 };
 
 #endif /* GRIDRENDERER_HPP_ */

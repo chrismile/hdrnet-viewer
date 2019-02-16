@@ -18,15 +18,15 @@ class VideoCapture;
 class Webcam
 {
 public:
-	Webcam();
-	~Webcam();
-	//! \param id is the number of the camera
-	bool open(int id = 0);
-	//! \return Returns false if no frame is available
-	bool readFrame(FrameDataPtr frameImage, FrameDataPtr downscaledImage);
+    Webcam();
+    ~Webcam();
+    //! \param id is the number of the camera
+    bool open(int id = 0);
+    //! \return Returns false if no frame is available
+    bool readFrame(FrameDataPtr frameImage, FrameDataPtr downscaledImage);
 
 private:
-	cv::VideoCapture *stream;
+    cv::VideoCapture *stream;
 };
 
 #endif /* WEBCAM_HPP_ */
