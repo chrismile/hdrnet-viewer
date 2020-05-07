@@ -1,11 +1,41 @@
 /*
- * MainApp.cpp
+ * BSD 3-Clause License
  *
- *  Created on: 04.10.2017
- *      Author: Christoph Neuhauser
+ * Copyright (c) 2017, Christoph Neuhauser
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "MainApp.hpp"
+
+#include <ImGui/ImGuiWrapper.hpp>
+#include <ImGui/imgui_internal.h>
+#include <ImGui/imgui_custom.h>
+#include <ImGui/imgui_stdlib.h>
 
 #include <Input/Keyboard.hpp>
 #include <Math/Math.hpp>
@@ -25,9 +55,15 @@
 #include <GL/glew.h>
 #include <climits>
 
-VolumeLightApp::VolumeLightApp()
-{
-    EventManager::get()->addListener(RESOLUTION_CHANGED_EVENT, [this](EventPtr event){ this->resolutionChanged(event); });
+void openglErrorCallback() {
+    std::cerr << "Application callback" << std::endl;
+}
+
+MainApp::MainApp() {
+    sgl::EventManager::get()->addListener(sgl::RESOLUTION_CHANGED_EVENT,
+            [this](sgl::EventPtr event){ this->resolutionChanged(event); });
+    sgl::Renderer->setErrorCallback(&openglErrorCallback);
+    sgl::Renderer->setDebugVerbosity(sgl::DEBUG_OUTPUT_CRITICAL_ONLY);
 
     // Webcam data
     webcam.open();
@@ -48,66 +84,108 @@ VolumeLightApp::VolumeLightApp()
             //"Data/pretrained_models/photoshop/infrared/",
             //"Data/pretrained_models/photoshop/lomo_fi/",
     };
+    filterNames = {
+            //"Instagram",
+            "Eboye",
+            "Faces",
+            //"Style Transfer 1024",
+            //"Style Transfer 2048",
+            //"Normal 1024",
+            "Strong 1024",
+            //"Early Bird",
+            //"False Colors",
+            //"Infrared",
+            //"lomo_fi",
+    };
     filterIndex = 0;
 
     // Filter
     gridRenderer.initialize(filters[filterIndex].c_str());
 }
 
-VolumeLightApp::~VolumeLightApp()
-{
+MainApp::~MainApp() {
 }
 
-void VolumeLightApp::render()
-{
-    Window *window = AppSettings::get()->getMainWindow();
+void MainApp::resolutionChanged(sgl::EventPtr event) {
+    sgl::Window *window = sgl::AppSettings::get()->getMainWindow();
+    glViewport(0, 0, window->getWidth(), window->getHeight());
+}
+
+void MainApp::processSDLEvent(const SDL_Event &event) {
+    sgl::ImGuiWrapper::get()->processSDLEvent(event);
+}
+
+void MainApp::render() {
+    sgl::Window *window = sgl::AppSettings::get()->getMainWindow();
     glViewport(0, 0, window->getWidth(), window->getHeight());
 
     if (webcam.readFrame(frameImage, downscaledImage)) {
         if (!frameTexture) {
-            frameTexture = TextureManager->createEmptyTexture(frameImage->w, frameImage->h);
-            downscaledTexture = TextureManager->createEmptyTexture(downscaledImage->w, downscaledImage->h);
+            frameTexture = sgl::TextureManager->createEmptyTexture(frameImage->w, frameImage->h);
+            downscaledTexture = sgl::TextureManager->createEmptyTexture(downscaledImage->w, downscaledImage->h);
         }
         frameTexture->uploadPixelData(frameImage->w, frameImage->h, frameImage->pixels);
         downscaledTexture->uploadPixelData(downscaledImage->w, downscaledImage->h, downscaledImage->pixels);
     }
 
-    glm::mat4 newProjMat(matrixOrthogonalProjection(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
-    Renderer->setProjectionMatrix(newProjMat);
-    Renderer->setViewMatrix(matrixIdentity());
-    Renderer->setModelMatrix(matrixIdentity());
+    glm::mat4 newProjMat(sgl::matrixOrthogonalProjection(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+    sgl::Renderer->setProjectionMatrix(newProjMat);
+    sgl::Renderer->setViewMatrix(sgl::matrixIdentity());
+    sgl::Renderer->setModelMatrix(sgl::matrixIdentity());
 
-    Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, Color(0, 0, 0));
+    sgl::Renderer->clearFramebuffer(GL_COLOR_BUFFER_BIT, sgl::Color(0, 0, 0));
 
     if (frameTexture) {
-        if (Keyboard->isKeyDown(SDLK_SPACE)) {
+        if (sgl::Keyboard->isKeyDown(SDLK_SPACE)) {
             gridRenderer.renderNormalImage(frameTexture, downscaledImage);
         } else {
             gridRenderer.renderTransformedImage(frameTexture, downscaledImage);
         }
 
-        Renderer->errorCheck();
+        sgl::Renderer->errorCheck();
     }
+
+    renderGUI();
 }
 
-void VolumeLightApp::resolutionChanged(EventPtr event)
-{
-    Window *window = AppSettings::get()->getMainWindow();
-    glViewport(0, 0, window->getWidth(), window->getHeight());
+void MainApp::renderGUI() {
+    sgl::ImGuiWrapper::get()->renderStart();
+
+    if (showSettingsWindow) {
+        if (ImGui::Begin("Settings", &showSettingsWindow)) {
+            // Draw an FPS counter
+            static float displayFPS = 60.0f;
+            static uint64_t fpsCounter = 0;
+            if (sgl::Timer->getTicksMicroseconds() - fpsCounter > 1e6) {
+                displayFPS = ImGui::GetIO().Framerate;
+                fpsCounter = sgl::Timer->getTicksMicroseconds();
+            }
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / fps, fps);
+            ImGui::Separator();
+
+            // Selection of displayed model
+            if (ImGui::Combo("Filter", &filterIndex, filterNames.data(), filterNames.size())) {
+                std::cout << filters[filterIndex] << std::endl;
+                gridRenderer.initialize(filters[filterIndex].c_str());
+            }
+        }
+        ImGui::End();
+    }
+
+    sgl::ImGuiWrapper::get()->renderEnd();
 }
 
-void VolumeLightApp::update(float dt)
-{
+void MainApp::update(float dt) {
     AppLogic::update(dt);
 
-    if (Keyboard->keyPressed(SDLK_UP)) {
+    if (sgl::Keyboard->keyPressed(SDLK_UP)) {
         filterIndex = (filterIndex+1) % filters.size();
-        cout << filters[filterIndex] << endl;
+        std::cout << filters[filterIndex] << std::endl;
         gridRenderer.initialize(filters[filterIndex].c_str());
     }
-    if (Keyboard->keyPressed(SDLK_DOWN)) {
+    if (sgl::Keyboard->keyPressed(SDLK_DOWN)) {
         filterIndex = (filterIndex-1 + filters.size()) % filters.size();
-        cout << filters[filterIndex] << endl;
+        std::cout << filters[filterIndex] << std::endl;
         gridRenderer.initialize(filters[filterIndex].c_str());
     }
 

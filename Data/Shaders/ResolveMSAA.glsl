@@ -1,9 +1,10 @@
 -- Vertex
 
-uniform mat4 mvpMatrix;
-attribute vec4 position;
-attribute vec2 texcoord;
-varying vec2 fragTexCoord;
+#version 430 core
+
+in vec4 position;
+in vec2 texcoord;
+out vec2 fragTexCoord;
 
 void main()
 {
@@ -13,17 +14,20 @@ void main()
 
 -- Fragment
 
+#version 430 core
+
 uniform sampler2DMS texture;
 uniform int numSamples;
-varying vec2 fragTexCoord;
- 
+in vec2 fragTexCoord;
+out vec4 fragColor;
+
 void main()
 {
     ivec2 size = textureSize(texture);
     ivec2 iCoords = ivec2(int(fragTexCoord.x*size.x), int(fragTexCoord.y*size.y));
     vec3 color = vec3(0, 0, 0); 
-    for (int sample = 0; sample < numSamples; sample++) {
-        color += texelFetch(texture, iCoords, sample).rgb;
+    for (int currSample = 0; currSample < numSamples; currSample++) {
+        color += texelFetch(texture, iCoords, currSample).rgb;
     }
-    gl_FragColor = vec4(color / numSamples, 1);
+    fragColor = vec4(color / numSamples, 1);
 }

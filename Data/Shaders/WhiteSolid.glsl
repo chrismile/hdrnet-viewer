@@ -1,18 +1,22 @@
 -- Vertex
 
-uniform mat4 mvpMatrix;
-attribute vec4 position;
+#version 430 core
+
+in vec4 vertexPosition;
 
 void main()
 {
-    gl_Position = mvpMatrix * position;
+    gl_Position = mvpMatrix * vertexPosition;
 }
 
 -- Fragment
 
+#version 430 core
+
 uniform sampler2D texture;
+out vec4 fragColor;
 
 void main()
 {
-    gl_FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
