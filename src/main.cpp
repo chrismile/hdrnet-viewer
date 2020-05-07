@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     sgl::FileUtils::get()->initialize("hdrnet-viewer", argc, argv);
 
     // Load the file containing the app settings
-    string settingsFile = FileUtils::get()->getConfigDirectory() + "settings.txt";
+    std::string settingsFile = sgl::FileUtils::get()->getConfigDirectory() + "settings.txt";
     sgl::AppSettings::get()->loadSettings(settingsFile.c_str());
     sgl::AppSettings::get()->setLoadGUI();
 
