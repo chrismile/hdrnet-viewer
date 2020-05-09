@@ -122,5 +122,3 @@ float *GridPredictor::computeGridCoefficients(FrameDataPtr &lowresImage) {
     float* coefficientData = outputs[0].flat<float>().data();
     return coefficientData;
 }
-
-

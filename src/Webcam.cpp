@@ -63,9 +63,16 @@ bool Webcam::open(int id) {
         return false;
     }
 
-    //bool b1 = stream->set(CV_CAP_PROP_FRAME_WIDTH, 1280);
-    //bool b2 = stream->set(CV_CAP_PROP_FRAME_HEIGHT, 720);
-    //std::cout << "Camera resolution width is " << stream->get(CV_CAP_PROP_FRAME_WIDTH) << " | change is ok: " << ((int)b1) << std::endl;
+#if (CV_VERSION_MAJOR <= 2)
+    bool b1 = stream->set(CV_CAP_PROP_FRAME_WIDTH, 640);
+    bool b2 = stream->set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+#else
+    bool b1 = stream->set(cv::CAP_PROP_FRAME_WIDTH, 640);
+    bool b2 = stream->set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+#endif
+
+    //std::cout << "Camera resolution width is " << stream->get(cv::CAP_PROP_FRAME_WIDTH) << std::endl;
+    //std::cout << "Camera resolution width is " << stream->get(cv::CAP_PROP_FRAME_WIDTH) << " | change is ok: " << ((int)b1) << std::endl;
 
     return true;
 }
@@ -78,16 +85,20 @@ bool Webcam::readFrame(FrameDataPtr frameImage, FrameDataPtr downscaledImage) {
     }
 
     if (frameImage->pixels == 0) {
-        frameImage->pixels = new uchar[frame.total()*4];;
+        frameImage->pixels = new uchar[frame.total()*4];
         frameImage->w = frame.cols;
         frameImage->h = frame.rows;
-        downscaledImage->pixels = new uchar[256*256*4];;
+        downscaledImage->pixels = new uchar[256*256*4];
         downscaledImage->w = 256;
         downscaledImage->h = 256;
     }
 
     cv::Mat rgbaMat(frame.size(), CV_8UC4, frameImage->pixels);
+#if (CV_VERSION_MAJOR <= 2)
     cv::cvtColor(frame, rgbaMat, CV_BGR2RGBA, 4);
+#else
+    cv::cvtColor(frame, rgbaMat, cv::COLOR_BGR2RGBA, 4);
+#endif
 
     // Downscale
     cv::Mat downscaledMat(256, 256, CV_8UC4, downscaledImage->pixels);
@@ -96,4 +107,13 @@ bool Webcam::readFrame(FrameDataPtr frameImage, FrameDataPtr downscaledImage) {
     return true;
 }
 
-
+glm::ivec2 Webcam::getResolution() {
+#if (CV_VERSION_MAJOR <= 2)
+    int cameraWidth = stream->get(CV_CAP_PROP_FRAME_WIDTH);
+    int cameraHeight = stream->get(CV_CAP_PROP_FRAME_HEIGHT);
+#else
+    int cameraWidth = stream->get(cv::CAP_PROP_FRAME_WIDTH);
+    int cameraHeight = stream->get(cv::CAP_PROP_FRAME_HEIGHT);
+#endif
+    return glm::ivec2(cameraWidth, cameraHeight);
+}

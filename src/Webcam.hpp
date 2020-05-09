@@ -34,6 +34,7 @@
 #define WEBCAM_HPP_
 
 #include <boost/shared_ptr.hpp>
+#include <glm/glm.hpp>
 #include "FrameData.hpp"
 
 namespace cv {
@@ -49,6 +50,8 @@ public:
     bool open(int id = 0);
     //! \return Returns false if no frame is available
     bool readFrame(FrameDataPtr frameImage, FrameDataPtr downscaledImage);
+    //! \return The resolution of the camera.
+    glm::ivec2 getResolution();
 
 private:
     cv::VideoCapture *stream;
