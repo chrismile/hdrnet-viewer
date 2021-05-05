@@ -43,6 +43,11 @@ int main(int argc, char *argv[]) {
     // Load the file containing the app settings
     std::string settingsFile = sgl::FileUtils::get()->getConfigDirectory() + "settings.txt";
     sgl::AppSettings::get()->loadSettings(settingsFile.c_str());
+#ifdef DATA_PATH
+    if (!sgl::FileUtils::get()->directoryExists("Data") && !sgl::FileUtils::get()->directoryExists("../Data")) {
+        sgl::AppSettings::get()->setDataDirectory(DATA_PATH);
+    }
+#endif
     sgl::AppSettings::get()->setLoadGUI();
 
     sgl::Window *window = sgl::AppSettings::get()->createWindow();

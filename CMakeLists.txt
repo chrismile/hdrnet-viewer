@@ -21,6 +21,9 @@ if (${CMAKE_VERSION} VERSION_GREATER "3.11")
     cmake_policy(SET CMP0072 NEW)
 endif()
 
+set(DATA_PATH "${CMAKE_SOURCE_DIR}/Data" CACHE PATH "location of folder 'Data'")
+add_definitions(-DDATA_PATH=\"${DATA_PATH}\")
+
 if(WIN32)
     add_executable(hdrnetviewer WIN32 ${SOURCES})
 else()
