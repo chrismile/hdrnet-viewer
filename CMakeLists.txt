@@ -53,4 +53,4 @@ target_link_libraries(hdrnetviewer ${OpenCV_LIBS})
 target_link_libraries(hdrnetviewer TensorflowCC::TensorflowCC)
 target_link_libraries(hdrnetviewer sgl)
 
-include_directories(${sgl_INCLUDES} ${Boost_INCLUDES} ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDES} ${TensorflowCC_INCLUDES})
+include_directories(${sgl_INCLUDES} ${Boost_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDES} ${TensorflowCC_INCLUDES})

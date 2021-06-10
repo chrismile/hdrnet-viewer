@@ -50,15 +50,14 @@ int main(int argc, char *argv[]) {
 #endif
     sgl::AppSettings::get()->setLoadGUI();
 
-    sgl::Window *window = sgl::AppSettings::get()->createWindow();
+   sgl::AppSettings::get()->createWindow();
     sgl::AppSettings::get()->initializeSubsystems();
 
     sgl::AppLogic *app = new MainApp();
     app->run();
-
     delete app;
+
     sgl::AppSettings::get()->release();
-    delete window;
 
     return 0;
 }
