@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 #endif
     sgl::AppSettings::get()->setLoadGUI();
 
-   sgl::AppSettings::get()->createWindow();
+    sgl::AppSettings::get()->createWindow();
     sgl::AppSettings::get()->initializeSubsystems();
 
     sgl::AppLogic *app = new MainApp();
