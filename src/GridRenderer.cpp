@@ -63,22 +63,24 @@
 
 using namespace sgl;
 
-void loadBytesFromFile(const std::string filename, int bytes, char *buffer) {
+void loadBytesFromFile(const std::string& filename, int bytes, char *buffer) {
     std::ifstream file(filename.c_str(), std::ios::binary);
     if(!file.is_open()) {
-        Logfile::get()->writeError(std::string() + "ERROR in loadFileContent: "
-                + "Couldn't load file " + filename);
+        Logfile::get()->writeError(
+                std::string() + "ERROR in loadFileContent: Couldn't load file \"" + filename + "\".");
     }
     file.read(buffer, bytes);
     file.close();
 }
 
 GridRenderer::GridRenderer() {
-    gridRenderShader = ShaderManager->getShaderProgram({"ApplyCoefficients.Vertex", "ApplyCoefficients.Fragment"});
-    blitShader = ShaderManager->getShaderProgram({"Blit.Vertex", "Blit.Fragment"});
+    gridRenderShader = ShaderManager->getShaderProgram(
+            {"ApplyCoefficients.Vertex", "ApplyCoefficients.Fragment"});
+    blitShader = ShaderManager->getShaderProgram(
+            {"Blit.Vertex", "Blit.Fragment"});
 }
 
-void GridRenderer::initialize(const char *path) {
+void GridRenderer::initialize(const std::string& path) {
     gridPredictor = GridPredictor();
     gridPredictor.loadGraph(path);
     glm::ivec3 gridSize = gridPredictor.getGridSize();
@@ -88,7 +90,8 @@ void GridRenderer::initialize(const char *path) {
     settings.internalFormat = GL_RGBA16F;
     gridTextures.clear();
     for (int i = 0; i < 3; ++i) {
-        TexturePtr gridTexture = TextureManager->createEmptyTexture(gridSize.x, gridSize.y, gridSize.z, settings);
+        TexturePtr gridTexture = TextureManager->createEmptyTexture(
+                gridSize.x, gridSize.y, gridSize.z, settings);
         gridTextures.push_back(gridTexture);
     }
 
@@ -121,10 +124,13 @@ void GridRenderer::renderTransformedImage(sgl::TexturePtr &imageTexture, FrameDa
 
     // Feed the shader with the data and render the quad
     int stride = sizeof(VertexTextured);
-    GeometryBufferPtr geomBuffer = Renderer->createGeometryBuffer(sizeof(VertexTextured)*fullscreenQuad.size(), &fullscreenQuad.front());
+    GeometryBufferPtr geomBuffer = Renderer->createGeometryBuffer(
+            sizeof(VertexTextured)*fullscreenQuad.size(), &fullscreenQuad.front());
     sgl::ShaderAttributesPtr gridRenderData = ShaderManager->createShaderAttributes(gridRenderShader);
-    gridRenderData->addGeometryBuffer(geomBuffer, "position", ATTRIB_FLOAT, 3, 0, stride);
-    gridRenderData->addGeometryBuffer(geomBuffer, "texcoord", ATTRIB_FLOAT, 2, sizeof(glm::vec3), stride);
+    gridRenderData->addGeometryBuffer(
+            geomBuffer, "vertexPosition", ATTRIB_FLOAT, 3, 0, stride);
+    gridRenderData->addGeometryBuffer(
+            geomBuffer, "vertexTexCoord", ATTRIB_FLOAT, 2, sizeof(glm::vec3), stride);
 
 
     float *affineCoefficients = gridPredictor.computeGridCoefficients(lowresImage);
@@ -134,7 +140,9 @@ void GridRenderer::renderTransformedImage(sgl::TexturePtr &imageTexture, FrameDa
     for (int i = 0; i < 3; ++i) {
         float *data = affineCoefficients + i*gridSize.x*gridSize.y*gridSize.z*4;
         TexturePtr gridTexture = gridTextures[i];
-        gridTexture->uploadPixelData(gridSize.x, gridSize.y, gridSize.z, data, PixelFormat(GL_RGBA, GL_FLOAT));
+        gridTexture->uploadPixelData(
+                gridSize.x, gridSize.y, gridSize.z, data,
+                PixelFormat(GL_RGBA, GL_FLOAT));
         std::string texUniformName = std::string() + "affineGridRow" + sgl::toString(i);
         gridRenderShader->setUniform(texUniformName.c_str(), gridTexture, i+1);
     }
@@ -149,26 +157,33 @@ void GridRenderer::renderNormalImage(sgl::TexturePtr &imageTexture, FrameDataPtr
 
     // Feed the shader with the data and render the quad
     int stride = sizeof(VertexTextured);
-    GeometryBufferPtr geomBuffer = Renderer->createGeometryBuffer(sizeof(VertexTextured)*fullscreenQuad.size(), &fullscreenQuad.front());
+    GeometryBufferPtr geomBuffer = Renderer->createGeometryBuffer(
+            sizeof(VertexTextured)*fullscreenQuad.size(), &fullscreenQuad.front());
     sgl::ShaderAttributesPtr renderData = ShaderManager->createShaderAttributes(blitShader);
-    renderData->addGeometryBuffer(geomBuffer, "position", ATTRIB_FLOAT, 3, 0, stride);
-    renderData->addGeometryBuffer(geomBuffer, "texcoord", ATTRIB_FLOAT, 2, sizeof(glm::vec3), stride);
-    blitShader->setUniform("texture", imageTexture);
+    renderData->addGeometryBuffer(
+            geomBuffer, "vertexPosition", ATTRIB_FLOAT, 3, 0, stride);
+    renderData->addGeometryBuffer(
+            geomBuffer, "vertexTexCoord", ATTRIB_FLOAT, 2, sizeof(glm::vec3), stride);
+    blitShader->setUniform("inputTexture", imageTexture);
 
     Renderer->render(renderData);
 }
 
 // See https://github.com/mgharbi/hdrnet/blob/master/benchmark/src/renderer.cc for more details
-void GridRenderer::loadGuideParameters(const char *path) {
+void GridRenderer::loadGuideParameters(const std::string& path) {
     glm::mat3x4 ccm;
     glm::vec4 mixMatrix;
     glm::vec3 shifts[16];
     glm::vec3 slopes[16];
 
-    loadBytesFromFile(std::string() + path + "guide_ccm_f32_3x4.bin", sizeof(glm::mat3x4), (char*)&ccm);
-    loadBytesFromFile(std::string() + path + "guide_mix_matrix_f32_1x4.bin", sizeof(glm::vec4), (char*)&mixMatrix);
-    loadBytesFromFile(std::string() + path + "guide_shifts_f32_16x3.bin", 16*3*sizeof(float), (char*)shifts);
-    loadBytesFromFile(std::string() + path + "guide_slopes_f32_16x3.bin", 16*3*sizeof(float), (char*)slopes);
+    loadBytesFromFile(
+            std::string() + path + "guide_ccm_f32_3x4.bin", sizeof(glm::mat3x4), (char*)&ccm);
+    loadBytesFromFile(
+            std::string() + path + "guide_mix_matrix_f32_1x4.bin", sizeof(glm::vec4), (char*)&mixMatrix);
+    loadBytesFromFile(
+            std::string() + path + "guide_shifts_f32_16x3.bin", 16*3*sizeof(float), (char*)shifts);
+    loadBytesFromFile(
+            std::string() + path + "guide_slopes_f32_16x3.bin", 16*3*sizeof(float), (char*)slopes);
 
     gridRenderShader->setUniform("guideCCM", ccm);
     gridRenderShader->setUniform("mixMatrix", mixMatrix);

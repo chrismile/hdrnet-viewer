@@ -2,14 +2,13 @@
 
 #version 430 core
 
-attribute vec2 position;
-attribute vec2 texcoord;
+in vec2 vertexPosition;
+in vec2 vertexTexCoord;
 out vec2 st;
 
-void main()
-{
-    st = texcoord;
-    gl_Position = vec4(position, 0., 1.);
+void main() {
+    st = vertexTexCoord;
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
 }
 
 -- Fragment
@@ -81,17 +80,16 @@ uniform vec4 mixMatrix;
 in vec2 st;
 out vec4 fragColorOut;
 
-void main()
-{
-    vec4 imageColor = vec4(texture2D(image, st).rgb, 1.0);
+void main() {
+    vec4 imageColor = vec4(texture(image, st).rgb, 1.0);
     
     // 1. Compute guidance map value
     vec3 temp = imageColor * guideCCM;
-    vec3 acc = vec3(0);
+    vec3 acc = vec3(0.0);
     for (int i = 0; i < 16; ++i) {
         acc += guideSlopes[i].xyz * max(vec3(0), temp - guideShifts[i].xyz);
     }
-    float guidanceValue = clamp(dot(mixMatrix, vec4(acc, 1.0)), 0, 1);
+    float guidanceValue = clamp(dot(mixMatrix, vec4(acc, 1.0)), 0.0, 1.0);
     
     // 2. Compute sliced coefficients
     vec3 gridCoords = vec3(st.x, st.y, guidanceValue);

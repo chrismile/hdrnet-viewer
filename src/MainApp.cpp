@@ -71,19 +71,22 @@ MainApp::MainApp() {
     downscaledImage = FrameDataPtr(new FrameData);
 
     filters = {
-            //"Data/pretrained_models/photoshop/instagram/",
-            "Data/pretrained_models/photoshop/eboye/",
-            "Data/pretrained_models/faces/",
-            //"Data/pretrained_models/style_transfer/style_transfer_1024/",
-            //"Data/pretrained_models/style_transfer/style_transfer_2048/",
-            ///////"Data/pretrained_models/style_transfer/style_transfer_n/",
-            "Data/pretrained_models/local_laplacian/normal_1024/",
-            "Data/pretrained_models/local_laplacian/strong_1024/",
-            //"Data/pretrained_models/photoshop/early_bird/",
-            //"Data/pretrained_models/photoshop/false_colors/",
-            //"Data/pretrained_models/photoshop/infrared/",
-            //"Data/pretrained_models/photoshop/lomo_fi/",
+            //"pretrained_models/photoshop/instagram/",
+            "pretrained_models/photoshop/eboye/",
+            "pretrained_models/faces/",
+            //"pretrained_models/style_transfer/style_transfer_1024/",
+            //"pretrained_models/style_transfer/style_transfer_2048/",
+            ///////"pretrained_models/style_transfer/style_transfer_n/",
+            "pretrained_models/   local_laplacian/normal_1024/",
+            "pretrained_models/local_laplacian/strong_1024/",
+            //"pretrained_models/photoshop/early_bird/",
+            //"pretrained_models/photoshop/false_colors/",
+            //"pretrained_models/photoshop/infrared/",
+            //"pretrained_models/photoshop/lomo_fi/",
     };
+    for (std::string& filter : filters) {
+        filter = sgl::AppSettings::get()->getDataDirectory() + filter;
+    }
     filterNames = {
             //"Instagram",
             "Eboye",
@@ -179,14 +182,14 @@ void MainApp::update(float dt) {
     AppLogic::update(dt);
 
     if (sgl::Keyboard->keyPressed(SDLK_UP)) {
-        filterIndex = (filterIndex+1) % filters.size();
+        filterIndex = (filterIndex + 1) % int(filters.size());
         std::cout << filters[filterIndex] << std::endl;
-        gridRenderer.initialize(filters[filterIndex].c_str());
+        gridRenderer.initialize(filters[filterIndex]);
     }
     if (sgl::Keyboard->keyPressed(SDLK_DOWN)) {
-        filterIndex = (filterIndex-1 + filters.size()) % filters.size();
+        filterIndex = (filterIndex-1 + int(filters.size())) % int(filters.size());
         std::cout << filters[filterIndex] << std::endl;
-        gridRenderer.initialize(filters[filterIndex].c_str());
+        gridRenderer.initialize(filters[filterIndex]);
     }
 
 }

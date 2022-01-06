@@ -48,7 +48,7 @@ public:
     GridPredictor();
     ~GridPredictor();
     //! \param path: Path to folder containing graph data
-    bool loadGraph(const char *path);
+    bool loadGraph(const std::string& path);
     /*!
      * \param lowresImage: 256x256 32-bit RGBA image
      * \return Returns the affine transform coefficients stored in the grid

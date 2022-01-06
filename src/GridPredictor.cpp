@@ -68,7 +68,7 @@ GridPredictor::~GridPredictor() {
     }
 }
 
-bool GridPredictor::loadGraph(const char *path) {
+bool GridPredictor::loadGraph(const std::string& path) {
     // 1. Create Tensorflow session
     tf::Status status = tf::NewSession(tf::SessionOptions(), &session);
 
@@ -115,7 +115,7 @@ float *GridPredictor::computeGridCoefficients(FrameDataPtr &lowresImage) {
     tf::Status status = session->Run(inputs, {outputName}, {}, &outputs);
     if (!status.ok()) {
         Logfile::get()->writeError(std::string() + "ERROR in GridPredictor::loadGraph: " + status.ToString());
-        return NULL;
+        return nullptr;
     }
 
     // Affine transform coefficients
